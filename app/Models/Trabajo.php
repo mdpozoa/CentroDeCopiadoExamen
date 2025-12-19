@@ -19,9 +19,6 @@ class Trabajo extends Model
         'estado'
     ];
 
-
-    // --- Funciones para el Controlador ---
-
     static public function getTrabajos() {
         return self::all();
     }

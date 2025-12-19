@@ -7,30 +7,39 @@ use Illuminate\Http\Request;
 
 class TrabajoController extends Controller
 {
-    //LISTA DE TRABAJOS
     public function index()
     {
         $trabajos = Trabajo::getTrabajos();
         return view('trabajos.index', compact('trabajos'));
     }
 
-    //CREAR (CREATE)
     public function create()
     {
         return view('trabajos.create');
     }
 
-    //ALMACENAR EN BDD
     public function store(Request $request)
     {
-      
-        $request->validate([
-            'descripcion'   => 'required',
-            'cliente'       => 'required',
-            'telefono'      => 'required',
+        // 1. Definimos las reglas
+        $rules = [
+            'descripcion'   => 'required|string|max:255',
+            'cliente'       => 'required|string|max:100',
+            'telefono'      => 'required|numeric', // Aquí obligamos a que sea número
             'fecha_entrega' => 'required|date',
             'estado'        => 'required'
-        ]);
+        ];
+
+        // 2. Definimos los mensajes personalizados en español
+        $messages = [
+            'telefono.numeric'  => 'El teléfono solo debe contener números.',
+            'telefono.required' => 'El teléfono es obligatorio.',
+            'cliente.required'  => 'El nombre del cliente es obligatorio.',
+            'descripcion.required' => 'La descripción es obligatoria.',
+            'fecha_entrega.required' => 'La fecha de entrega es obligatoria.'
+        ];
+
+        // 3. Ejecutamos la validación con nuestros mensajes
+        $request->validate($rules, $messages);
 
         Trabajo::createTrabajo($request->all());
 
@@ -38,21 +47,36 @@ class TrabajoController extends Controller
             ->with('success', 'Trabajo registrado correctamente.');
     }
 
-    
+    public function show(Trabajo $trabajo)
+    {
+        return view('trabajos.show', compact('trabajo'));
+    }
+
     public function edit(Trabajo $trabajo)
     {
         return view('trabajos.edit', compact('trabajo'));
     }
-        //ACTURALIZAR (UPDATE)
+
     public function update(Request $request, Trabajo $trabajo)
     {
-        $request->validate([
-            'descripcion'   => 'required',
-            'cliente'       => 'required',
-            'telefono'      => 'required',
+        // Repetimos lo mismo para la actualización
+        $rules = [
+            'descripcion'   => 'required|string|max:255',
+            'cliente'       => 'required|string|max:100',
+            'telefono'      => 'required|numeric',
             'fecha_entrega' => 'required|date',
             'estado'        => 'required'
-        ]);
+        ];
+
+        $messages = [
+            'telefono.numeric'  => 'El teléfono solo debe contener números.',
+            'telefono.required' => 'El teléfono es obligatorio.',
+            'cliente.required'  => 'El nombre del cliente es obligatorio.',
+            'descripcion.required' => 'La descripción es obligatoria.',
+            'fecha_entrega.required' => 'La fecha de entrega es obligatoria.'
+        ];
+
+        $request->validate($rules, $messages);
 
         $trabajo->updateTrabajo($request->all());
 
@@ -60,7 +84,6 @@ class TrabajoController extends Controller
             ->with('success', 'Trabajo actualizado correctamente.');
     }
 
-    // ELIMINAR TRABAJO (DELETE)
     public function destroy(Trabajo $trabajo)
     {
         Trabajo::deleteTrabajo($trabajo);
@@ -69,4 +92,3 @@ class TrabajoController extends Controller
             ->with('success', 'Trabajo eliminado.');
     }
 }
-

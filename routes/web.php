@@ -7,5 +7,4 @@ Route::get('/', function () {
     return redirect()->route('trabajos.index');
 });
 
-//CRUD
 Route::resource('trabajos', TrabajoController::class);
